@@ -35,16 +35,33 @@ OneWireNg::ErrorCode OneWireNg_BitBang::reset()
 
     timeCriticalEnter();
     if (_flgs.pwre) powerBus(false);
-    setBus(0);
-    timeCriticalExit();
-    delayUs(480);
-    timeCriticalEnter();
-    setBus(1);
-    delayUs(90);
-    presPulse = readGpioIn(GPIO_DTA);
-    timeCriticalExit();
-    delayUs(390);
 
+#ifdef CONFIG_OVERDRIVE_ENABLED
+    if (_overdrive)
+    {
+        /* overdrive mode */
+        delayUs(3);
+        setBus(0);
+        delayUs(70);
+        setBus(1);
+        delayUs(9);
+        presPulse = readGpioIn(GPIO_DTA);
+        timeCriticalExit();
+        delayUs(39);
+    } else
+#endif
+    {
+        /* standard mode */
+        setBus(0);
+        timeCriticalExit();
+        delayUs(480);
+        timeCriticalEnter();
+        setBus(1);
+        delayUs(90);
+        presPulse = readGpioIn(GPIO_DTA);
+        timeCriticalExit();
+        delayUs(390);
+    }
     return (presPulse ? EC_NO_DEVS : EC_SUCCESS);
 }
 
@@ -54,24 +71,54 @@ int OneWireNg_BitBang::touchBit(int bit)
 
     timeCriticalEnter();
     if (_flgs.pwre) powerBus(false);
-    setBus(0);
-    if (bit != 0)
+
+#ifdef CONFIG_OVERDRIVE_ENABLED
+    if (_overdrive)
     {
-        /* write-1 w/ sampling alias read */
-        delayUs(5);
-        setBus(1);
-        delayUs(8);
-        /* start sampling at 13us */
-        smpl = readGpioIn(GPIO_DTA);
-        timeCriticalExit();
-        delayUs(52);
+        /* overdrive mode */
+        if (bit != 0)
+        {
+            /* write-1 w/ sampling alias read */
+            setBus(0);
+            delayUs(1);
+            setBus(1);
+            delayUs(1);
+            /* start sampling at 2us */
+            smpl = readGpioIn(GPIO_DTA);
+            timeCriticalExit();
+            delayUs(7);
+        } else
+        {
+            setBus(0);
+            delayUs(8);     /* preferably 7.5 */
+            setBus(1);
+            timeCriticalExit();
+            delayUs(2);
+        }
     } else
+#endif
     {
-        /* write-0 */
-        delayUs(65);
-        setBus(1);
-        timeCriticalExit();
-        delayUs(5);
+        /* standard mode */
+        if (bit != 0)
+        {
+            /* write-1 w/ sampling alias read */
+            setBus(0);
+            delayUs(5);
+            setBus(1);
+            delayUs(8);
+            /* start sampling at 13us */
+            smpl = readGpioIn(GPIO_DTA);
+            timeCriticalExit();
+            delayUs(52);
+        } else
+        {
+            /* write-0 */
+            setBus(0);
+            delayUs(65);
+            setBus(1);
+            timeCriticalExit();
+            delayUs(5);
+        }
     }
     return smpl;
 }

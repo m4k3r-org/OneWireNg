@@ -1,6 +1,6 @@
 # OneWireNg
 
-Ths is an Arduino 1-wire service library, intended as an alternative for the
+This is an Arduino 1-wire service library, intended as an alternative for the
 classic [OneWire](https://github.com/PaulStoffregen/OneWire) library. The library
 provides basic 1-wire services (reset, search, touch, read, write, parasite
 powering) and may serve for further work while interfacing with various 1-wire
@@ -34,6 +34,11 @@ devices (e.g. Dallas/Maxim thermometers).
   Search algorithm allows efficient filtering basing on a selected set of family
   codes. Maximum size of the set is configurable by `CONFIG_MAX_SRCH_FILTERS`
   configuration macro-define.
+
+* Overdrive (high-speed) mode support.
+
+  The overdrive mode enables speed up the 1-wire communication by a factor of 10.
+  Only limited number of 1-wire devices support this mode (e.g. DS2408).
 
 * Clear and flexible architecture.
 
@@ -186,8 +191,8 @@ configures 1-wire service to work in one of the above modes (AVR platform).
 ## DallasTemperature library
 
 The [following fork](https://github.com/pstolarz/Arduino-Temperature-Control-Library/tree/OneWireNg)
-provides [`DallasTemperature`](https://github.com/milesburton/Arduino-Temperature-Control-Library)
-library ported with `OneWireNg` library. `OneWireNg` branch of the fork contains
+provides [DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library)
+library ported with OneWireNg library. `OneWireNg` branch of the fork contains
 the ported library version. Releases are tagged staring with `OneWireNg_` prefix
 (e.g. `OneWireNg_3.8.1`).
 
