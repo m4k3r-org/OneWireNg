@@ -40,27 +40,27 @@ OneWireNg::ErrorCode OneWireNg_BitBang::reset()
     if (_overdrive)
     {
         /* overdrive mode */
-        delayUs(3);
+        delayUs(2);
         setBus(0);
-        delayUs(70);
+        delayUs(68);    /* 53-80 us */
         setBus(1);
-        delayUs(9);
+        delayUs(8);     /* presence-detect sample at 8-9 us */
         presPulse = readGpioIn(GPIO_DTA);
         timeCriticalExit();
-        delayUs(39);
+        delayUs(40);
     } else
 #endif
     {
         /* standard mode */
         setBus(0);
         timeCriticalExit();
-        delayUs(480);
+        delayUs(480);   /* min 480 us */
         timeCriticalEnter();
         setBus(1);
-        delayUs(90);
+        delayUs(70);    /* presence-detect sample at 68-75 us */
         presPulse = readGpioIn(GPIO_DTA);
         timeCriticalExit();
-        delayUs(390);
+        delayUs(410);
     }
     return (presPulse ? EC_NO_DEVS : EC_SUCCESS);
 }
@@ -82,18 +82,19 @@ int OneWireNg_BitBang::touchBit(int bit)
             setBus(0);
             delayUs(1);
             setBus(1);
-            delayUs(1);
-            /* start sampling at 2us */
+            delayUs(0);     /* NOP */
+            /* start sampling immediately; max at 2 us */
             smpl = readGpioIn(GPIO_DTA);
             timeCriticalExit();
             delayUs(7);
         } else
         {
+            /* write-0 */
             setBus(0);
-            delayUs(8);     /* preferably 7.5 */
+            delayUs(8);     /* 8-13 us */
             setBus(1);
             timeCriticalExit();
-            delayUs(2);
+            delayUs(1);     /* 1-2 us */
         }
     } else
 #endif
@@ -106,18 +107,18 @@ int OneWireNg_BitBang::touchBit(int bit)
             delayUs(5);
             setBus(1);
             delayUs(8);
-            /* start sampling at 13us */
+            /* start sampling at 13us; max at 15 us */
             smpl = readGpioIn(GPIO_DTA);
             timeCriticalExit();
-            delayUs(52);
+            delayUs(56);
         } else
         {
             /* write-0 */
             setBus(0);
-            delayUs(65);
+            delayUs(60);    /* 60-120 us */
             setBus(1);
             timeCriticalExit();
-            delayUs(5);
+            delayUs(10);    /* 5-15 us */
         }
     }
     return smpl;
