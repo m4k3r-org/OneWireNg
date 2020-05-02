@@ -17,12 +17,14 @@
  */
 #ifdef ARDUINO
 # include "Arduino.h"
+# include "DelayHalfUs.h"
 # define delayUs(dly) delayMicroseconds(dly)
 # define timeCriticalEnter() noInterrupts()
 # define timeCriticalExit() interrupts()
 #elif defined(__TEST__)
 # include <unistd.h>
 # define delayUs(dly) usleep(dly)
+# define delayHalfUs()
 # define timeCriticalEnter()
 # define timeCriticalExit()
 #else
@@ -82,7 +84,7 @@ int OneWireNg_BitBang::touchBit(int bit)
             setBus(0);
             delayUs(1);
             setBus(1);
-            delayUs(0);     /* NOP */
+            delayHalfUs();
             /* start sampling immediately; max at 2 us */
             smpl = readGpioIn(GPIO_DTA);
             timeCriticalExit();

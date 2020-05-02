@@ -38,7 +38,7 @@ devices (e.g. Dallas/Maxim thermometers).
 * Overdrive (high-speed) mode support.
 
   The overdrive mode enables speed up the 1-wire communication by a factor of 10.
-  Only limited number of 1-wire devices support this mode (e.g. DS2408).
+  Only limited number of 1-wire devices support this mode (e.g. DS2408, DS2431).
 
 * Clear and flexible architecture.
 
